@@ -1,0 +1,961 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     34398,        953]
+NotebookOptionsPosition[     33706,        934]
+NotebookOutlinePosition[     34154,        952]
+CellTagsIndexPosition[     34111,        949]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"(*", " ", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+    "This", " ", "Mathematica", " ", "notebook", " ", "is", " ", "for", " ", 
+     "calculating", " ", "the", " ", "infection", " ", "probability", " ", 
+     "for", " ", "an", " ", "individual", " ", "with", " ", "two", " ", 
+     "negative", " ", "test", " ", "results", " ", "based", " ", "on", " ", 
+     "the", " ", "article", 
+     "\"\<Quantifying the effect of isolation and negative certification on \
+COVID-19 transmission\>\"", " ", "by", " ", "Jun"}], "-", 
+    RowBox[{"ichi", " ", "Takeshita"}]}], ",", " ", 
+   RowBox[{"Michio", " ", "Murakami"}], ",", " ", 
+   RowBox[{"Masashi", " ", "Kamo"}], ",", " ", 
+   RowBox[{"Wataru", " ", "Naito"}], ",", " ", 
+   RowBox[{"Tetuso", " ", "Yasutaka"}], ",", " ", 
+   RowBox[{"and", " ", "Seiya", " ", "Imoto", " ", 
+    RowBox[{"(", 
+     RowBox[{"doi", ":", 
+      RowBox[{
+       RowBox[{"10.1101", "/", "2022.02"}], ".20", ".22270449"}]}], ")"}]}]}],
+   "  ", "*)"}]], "Input",
+ CellChangeTimes->{{3.8304218611611567`*^9, 3.830422154747374*^9}, {
+  3.830422555972279*^9, 3.830422666927904*^9}, {3.830918399389429*^9, 
+  3.830918686647286*^9}, {3.831030444616395*^9, 3.8310305132868032`*^9}, {
+  3.831030642788127*^9, 3.831030675191971*^9}, {3.83103071765597*^9, 
+  3.831031118727736*^9}, {3.831031158664424*^9, 3.831031169912237*^9}, {
+  3.831031619412616*^9, 3.831031692148656*^9}, {3.886619306777199*^9, 
+  3.886619337998814*^9}, {3.88661937128507*^9, 3.8866193783325253`*^9}, {
+  3.8866194186880074`*^9, 3.886619425930451*^9}, {3.886619464212407*^9, 
+  3.886619564126196*^9}, {3.886619618728965*^9, 3.886619663424509*^9}, {
+  3.8866197034768763`*^9, 3.88661972218149*^9}, {3.886620092657587*^9, 
+  3.8866201338929663`*^9}, {3.886620242432332*^9, 3.8866203682314587`*^9}, {
+  3.8866204695885897`*^9, 3.8866204996237*^9}, {3.88662068263262*^9, 
+  3.886620691730229*^9}},ExpressionUUID->"0196a7d1-f4ba-4c74-b77d-\
+f6410697ab44"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"PSi", ":", " ", 
+    RowBox[{
+    "the", " ", "infection", " ", "probability", " ", "for", " ", "an", " ", 
+     "individual", " ", "with", " ", "a", " ", "negative", " ", "PCR", " ", 
+     "test", " ", "result", " ", "on", " ", "both", " ", "day", " ", "0", " ",
+      "and", " ", "day", " ", "i"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"a1", ",", " ", "a2", ",", " ", 
+    RowBox[{"as", "\[Rule]", 
+     RowBox[{"sensitivity", " ", 
+      RowBox[{"(", 
+       RowBox[{"a1", "<", "a2", "<", "as"}], ")"}]}]}], "\:ff0c", 
+    RowBox[{"b", "\[Rule]"}], ",", " ", "\[IndentingNewLine]", 
+    RowBox[{"PSi", "\[Rule]", 
+     RowBox[{"initial", " ", "probability", " ", "of", " ", "state", " ", 
+      RowBox[{"S", "'"}]}]}], "\:ff0c", "\[IndentingNewLine]", 
+    RowBox[{"PEi", "\[Rule]", 
+     RowBox[{
+     "initial", " ", "probability", " ", "of", " ", "state", " ", "E"}]}], 
+    "\:ff0c", "\[IndentingNewLine]", 
+    RowBox[{"PIa1i", "\[Rule]", 
+     RowBox[{
+     "initial", " ", "probability", " ", "of", " ", "state", " ", "Ia1i"}]}], 
+    ",", " ", "\[IndentingNewLine]", 
+    RowBox[{"PIa2i", "\[Rule]", 
+     RowBox[{
+     "initial", " ", "probability", " ", "of", " ", "state", " ", "Ia2i"}]}], 
+    ",", " ", "\[IndentingNewLine]", 
+    RowBox[{"PIsi", "->", 
+     RowBox[{
+     "initial", " ", "probability", " ", "of", " ", "state", " ", "Isi"}]}], 
+    ",", "\[IndentingNewLine]", 
+    RowBox[{"Pc", "->", 
+     RowBox[{
+     "general", " ", "initial", " ", "infection", " ", "probability"}]}]}], 
+   "\[IndentingNewLine]", "*)"}]}]], "Input",
+ CellChangeTimes->{{3.8304218611611567`*^9, 3.830422154747374*^9}, {
+  3.830422555972279*^9, 3.830422666927904*^9}, {3.830918399389429*^9, 
+  3.830918686647286*^9}, {3.831030444616395*^9, 3.8310305132868032`*^9}, {
+  3.831030642788127*^9, 3.831030675191971*^9}, {3.83103071765597*^9, 
+  3.831031118727736*^9}, {3.831031158664424*^9, 3.831031169912237*^9}, {
+  3.831031619412616*^9, 3.831031692148656*^9}, {3.886619306777199*^9, 
+  3.886619337998814*^9}, {3.88661937128507*^9, 3.8866193783325253`*^9}, {
+  3.8866194186880074`*^9, 3.886619425930451*^9}, {3.886619464212407*^9, 
+  3.886619564126196*^9}, {3.886619618728965*^9, 3.886619663424509*^9}, {
+  3.8866197034768763`*^9, 3.88661972218149*^9}, {3.886620092657587*^9, 
+  3.8866201338929663`*^9}, {3.886620242432332*^9, 
+  3.8866203682314587`*^9}},ExpressionUUID->"3d94529e-4f86-4a1e-89ce-\
+65d787573b15"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS0", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "PIa1i_", ",", " ", "PIa2i_", ",", 
+      " ", "\n", "    ", "PIsi_"}], "]"}], " ", ":=", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"b", "*", "PSi"}], ")"}], "/", "\n", "    ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "PSi"}], "+", 
+       RowBox[{"b", "*", "PEi"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "PIa2i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], " ", 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS1", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "PIa1i_", ",", " ", "PIa2i_", ",", 
+      " ", "\n", "    ", "PIsi_"}], "]"}], " ", ":=", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", " ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}]}], ")"}], "/", "\n", "    ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", "  ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"6", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], " ", 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS2", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "PIa1i_", ",", " ", "PIa2i_", ",", 
+      " ", "\n", "    ", "PIsi_"}], "]"}], " ", ":=", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", " ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}]}], ")"}], "/", "\n", "    ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", " ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       "  ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], " ", "+", 
+       " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"5", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS3", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"3", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"3", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PEi"}], 
+       " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"4", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS4", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"4", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"4", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PEi"}], 
+       " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"3", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS5", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"5", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"5", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS6", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"6", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"6", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIsi"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS7", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}], " ", "+", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa2i"}]}], 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS8", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", "   ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "PIa1i"}]}], " ", 
+      ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS9", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}]}], 
+      " ", ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS10", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}]}], 
+      " ", ")"}]}]}], ";"}], "  "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS11", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}], "+", "0", "+", "0", "+",
+        "0", " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PEi"}]}], 
+      " ", ")"}]}]}], ";"}], " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS12", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}]}]}], ";"}], 
+  " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS13", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}]}]}], ";"}], 
+  " "}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS14", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "\n", "    ", "PIa1i_", ",", " ", 
+      "PIa2i_", ",", " ", "PIsi_"}], "]"}], " ", ":=", " ", "\n", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}], "/", 
+     "\[IndentingNewLine]", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"b", "*", "b", "*", "PEi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", "b", "*", "PIa1i"}], 
+       "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", "b", "*", "PIa2i"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", " ", "*", 
+        "PIsi"}], " ", "+", " ", 
+       RowBox[{"b", "*", " ", "b", "*", " ", "PSi"}]}], ")"}]}]}], ";"}], 
+  " "}]}], "Input",
+ CellChangeTimes->{{3.8334584603253508`*^9, 3.833458548525141*^9}, 
+   3.886619983222579*^9},ExpressionUUID->"d1223e8a-01db-4b2b-9523-\
+85a46f5640e0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"PS1b", ":", " ", 
+    RowBox[{
+    "infection", " ", "probability", " ", "for", " ", "an", " ", "individual",
+      " ", "with", " ", "a", " ", "negative", " ", "PCR", " ", "test", " ", 
+     "result", " ", "on", " ", "day", " ", "0", " ", "and", " ", "a", " ", 
+     "negative", " ", "PCR", " ", "or", " ", "antigen", " ", "test", " ", 
+     "result", " ", "on", " ", "day", " ", "1."}]}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"PS1b", "[", 
+     RowBox[{
+     "a1_", ",", " ", "a2_", ",", " ", "as_", ",", " ", "b_", ",", " ", 
+      "PSi_", ",", " ", "PEi_", ",", " ", "PIa1i_", ",", " ", "PIa2i_", ",", 
+      " ", "\n", "    ", "PIsi_"}], "]"}], " ", ":=", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", " ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}]}], ")"}], "/", "\n", "    ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", "b", "*", "PIsi"}], 
+       " ", "+", "  ", 
+       RowBox[{"b", "*", "b", "*", "PSi"}], "+", " ", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"2", "/", "3"}], ")"}], "*", "b", "*", "b", "*", "PEi"}], 
+       "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", "/", "3"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", 
+          RowBox[{"0.7", "*", "a1"}]}], ")"}], "*", "b", "*", "PEi"}], "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a1"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", 
+          RowBox[{"0.7", "*", "a2"}]}], ")"}], "*", "PIa1i"}], " ", "+", " ", 
+       
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "a2"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", 
+          RowBox[{"0.7", "*", "as"}]}], ")"}], "*", "PIa2i"}], " ", "+", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"6", "/", "7"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", " ", "as"}], ")"}], "*", 
+        RowBox[{"(", 
+         RowBox[{"1", " ", "-", 
+          RowBox[{"0.7", "*", " ", "as"}]}], ")"}], "*", "PIsi"}]}], " ", 
+      ")"}]}]}], ";"}], " "}]], "Input",
+ CellChangeTimes->{{3.833458976959703*^9, 3.8334589954201193`*^9}, {
+  3.833459037454851*^9, 3.8334590611381407`*^9}, {3.886619994243889*^9, 
+  3.8866200061348057`*^9}, {3.88662007061042*^9, 
+  3.8866200798907623`*^9}},ExpressionUUID->"b0f6a295-3ea4-42a6-b88e-\
+4df375284f06"]
+},
+WindowSize->{960, 1048},
+WindowMargins->{{0, Automatic}, {Automatic, -31}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+FrontEndVersion->"13.1 for Mac OS X ARM (64-bit) (June 16, 2022)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"04a52506-e6f6-46b4-9f24-560363280b5c"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 1959, 36, 115, "Input",ExpressionUUID->"0196a7d1-f4ba-4c74-b77d-f6410697ab44"],
+Cell[2520, 58, 2501, 51, 220, "Input",ExpressionUUID->"3d94529e-4f86-4a1e-89ce-65d787573b15"],
+Cell[5024, 111, 25852, 746, 1438, "Input",ExpressionUUID->"d1223e8a-01db-4b2b-9523-85a46f5640e0"],
+Cell[30879, 859, 2823, 73, 136, "Input",ExpressionUUID->"b0f6a295-3ea4-42a6-b88e-4df375284f06"]
+}
+]
+*)
+
